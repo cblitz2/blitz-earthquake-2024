@@ -52,11 +52,11 @@ public class EarthquakeFrame extends JFrame {
                     String[] parts = selectedValue.split(" ");
                     double longitude = Double.parseDouble(parts[parts.length - 2]);
                     double latitude = Double.parseDouble(parts[parts.length - 1]);
-                    if (Desktop.isDesktopSupported() &&
-                            Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    if (Desktop.isDesktopSupported()
+                            && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                         try {
-                            Desktop.getDesktop().browse(new URI
-                                    ("https://www.google.com/maps/search/?api=1&query="
+                            Desktop.getDesktop().browse(new URI(
+                                    "https://www.google.com/maps/search/?api=1&query="
                                             + latitude + "," + longitude));
                         } catch (IOException | URISyntaxException ex) {
                             throw new RuntimeException(ex);
