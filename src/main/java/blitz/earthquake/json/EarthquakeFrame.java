@@ -18,6 +18,7 @@ public class EarthquakeFrame extends JFrame {
     private JRadioButton oneHour = new JRadioButton("One hour");
     private JRadioButton sigMonth = new JRadioButton("30 days");
     private Disposable disposable;
+    private FeatureCollection currentFeatures;
 
 
     public EarthquakeFrame() {
@@ -44,16 +45,14 @@ public class EarthquakeFrame extends JFrame {
         sigMonth.addActionListener(e -> fetchData(service.sigMonth()));
 
         jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jlist.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                String selectedValue = jlist.getSelectedValue();
-                if (selectedValue != null) {
-                    String[] parts = selectedValue.split(" ");
-                    double longitude = Double.parseDouble(parts[parts.length - 2]);
-                    double latitude = Double.parseDouble(parts[parts.length - 1]);
-                    if (Desktop.isDesktopSupported()
-                            && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            if (!e.getValueIsAdjusting() && currentFeatures != null) {
+                int index = jlist.getSelectedIndex();
+                if (index != -1) {
+                    Feature feature = currentFeatures.features[index];
+                    double latitude = feature.geometry.coordinates[1];
+                    double longitude = feature.geometry.coordinates[0];
+                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                         try {
                             Desktop.getDesktop().browse(new URI(
                                     "https://www.google.com/maps/search/?api=1&query="
@@ -83,12 +82,11 @@ public class EarthquakeFrame extends JFrame {
     }
 
     private void handleResponse(FeatureCollection response) {
+        currentFeatures = response;
         String[] listData = new String[response.features.length];
         for (int i = 0; i < response.features.length; i++) {
             Feature feature = response.features[i];
-            double lat = feature.geometry.coordinates[0];
-            double lng = feature.geometry.coordinates[1];
-            listData[i] = feature.properties.mag + " " + feature.properties.place + " " + lat + " " + lng;
+            listData[i] = feature.properties.mag + " " + feature.properties.place;
         }
         jlist.setListData(listData);
     }
